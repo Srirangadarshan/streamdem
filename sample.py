@@ -2,7 +2,7 @@ import streamlit as st
 import os
 import google.generativeai as genai
 from PIL import Image
-import cv2  # Import OpenCV for camera access
+import cv2
 
 genai.configure(api_key="YOUR_API_KEY")  # Replace with your Gemini API key
 
@@ -21,13 +21,8 @@ def process_uploaded_image(uploaded_file):
     else:
         raise FileNotFoundError("No file uploaded")
 
-## Function to capture image from camera (single shot with fallback)
+## Function to capture image from camera (single shot)
 def capture_camera_image():
-    # Check for mobile browser support (heuristic example)
-    if 'Mobile' in st.session_state.get('platform', ''):
-        st.error("Direct camera access might be restricted on your mobile browser. Please upload an image instead.")
-        return None
-
     cap = cv2.VideoCapture(1)  # Open rear camera (index 1)
 
     # Check if camera opened successfully
@@ -37,15 +32,19 @@ def capture_camera_image():
     # Capture a single frame
     ret, frame = cap.read()
 
+    # Display the captured frame (optional)
+    # cv2.imshow('Camera', frame)
+    # cv2.waitKey(0)
+
+    # Release the capture and close all windows
+    cap.release()
+    cv2.destroyAllWindows()
+
     # Convert frame to RGB for compatibility
     image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
     # Convert to PIL Image for processing
     image = Image.fromarray(image)
-
-    # Release the capture and close all windows
-    cap.release()
-    cv2.destroyAllWindows()
 
     # Convert PIL Image to list format for Gemini API
     image_parts = [{'mime_type': 'image/jpeg', 'data': image.tobytes()}]
@@ -95,4 +94,6 @@ if submit:
     if image_parts is None:
         st.error("Please upload an image or capture one from the camera.")
     else:
-        response = get_gemini_response(input_prompt, image_parts,
+        response = get_gemini_response(input_prompt, image_parts, input_text)
+        st.subheader("The Response is")
+        st.write(response)
