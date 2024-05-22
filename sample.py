@@ -4,7 +4,7 @@ import google.generativeai as genai
 from PIL import Image
 import cv2
 
-genai.configure(api_key="AIzaSyCYCd5IvUeLuO0d44pVi6yyYGg5FnxxuDI")  # Replace with your Gemini API key
+genai.configure(api_key="")  # Replace with your Gemini API key
 
 ## Function to load Google Gemini Pro Vision API
 def get_gemini_response(input_prompt, image_data, input_text):
